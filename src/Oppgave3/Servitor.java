@@ -1,29 +1,27 @@
-package Oppgave2;
+package Oppgave3;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public class Kokk extends Thread {
+public class Servitor extends Thread {
     private final HamburgerBrett brett;
     private final String navn;
 
-    public Kokk(HamburgerBrett brett, String navn) {
+    public Servitor(HamburgerBrett brett, String navn) {
         this.brett = brett;
         this.navn = navn;
     }
 
-    private void lagBurger() {
+    public void fjernBurger() {
         synchronized (brett) {
-            while (brett.getHamburgere().size() == brett.getKapasitet()) {
-                System.out.println(String.format("%s (kokk) klar med hamburger, men brett er fullt. Venter!", navn));
+            while (brett.getHamburgere().size() == 0) {
+                System.out.println(String.format("%s (servitør) ønsker å ta hamburger, men brett tomt. Venter!", navn));
                 try {
                     brett.wait();
                 } catch (InterruptedException e) {
                 }
             }
 
-            Hamburger burger = new Hamburger(brett.getBurgerIndex());
-            brett.setBurgerIndex();
-            brett.getHamburgere().add(burger);
+            Hamburger burger = brett.getHamburgere().remove();
 
             System.out.println(toString(burger));
             brett.notifyAll();
@@ -32,7 +30,7 @@ public class Kokk extends Thread {
 
     public void run() {
         while (true) {
-            lagBurger();
+            fjernBurger();
 
             try {
                 Thread.sleep(ThreadLocalRandom.current().nextLong(2, 6) * 1000);
@@ -42,6 +40,6 @@ public class Kokk extends Thread {
     }
 
     public String toString(Hamburger hamburger) {
-        return String.format("%s (kokk) legger på hamburger %s. Brett: %s", navn, hamburger, brett.toString());
+        return String.format("%s (servitør) tar av hamburger %s. Brett: %s", navn, hamburger, brett);
     }
 }
