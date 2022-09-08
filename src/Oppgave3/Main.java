@@ -14,6 +14,12 @@ public class Main {
             new Kokk(brett, navn).start();
         }
 
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+
+        }
+
         for (String navn : servitorer) {
             new Servitor(brett, navn).start();
         }

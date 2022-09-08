@@ -11,35 +11,21 @@ public class Servitor extends Thread {
         this.navn = navn;
     }
 
-    public void fjernBurger() {
-        synchronized (brett) {
-            while (brett.getHamburgere().size() == 0) {
-                System.out.println(String.format("%s (servitør) ønsker å ta hamburger, men brett tomt. Venter!", navn));
-                try {
-                    brett.wait();
-                } catch (InterruptedException e) {
-                }
-            }
-
-            Hamburger burger = brett.getHamburgere().remove();
-
-            System.out.println(toString(burger));
-            brett.notifyAll();
-        }
+    public void fjernBurger() throws InterruptedException {
+        skrivUt(brett.remove());
     }
 
     public void run() {
         while (true) {
-            fjernBurger();
-
             try {
+                fjernBurger();
                 Thread.sleep(ThreadLocalRandom.current().nextLong(2, 6) * 1000);
             } catch (InterruptedException e) {
             }
         }
     }
 
-    public String toString(Hamburger hamburger) {
-        return String.format("%s (servitør) tar av hamburger %s. Brett: %s", navn, hamburger, brett);
+    public void skrivUt(Hamburger hamburger) {
+        System.out.println(String.format("%s (servitør) tar av hamburger %s. Brett: %s", navn, hamburger, brett));
     }
 }

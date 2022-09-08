@@ -11,37 +11,21 @@ public class Kokk extends Thread {
         this.navn = navn;
     }
 
-    private void lagBurger() {
-        synchronized (brett) {
-            while (brett.getHamburgere().size() == brett.getKapasitet()) {
-                System.out.println(String.format("%s (kokk) klar med hamburger, men brett er fullt. Venter!", navn));
-                try {
-                    brett.wait();
-                } catch (InterruptedException e) {
-                }
-            }
-
-            Hamburger burger = new Hamburger(brett.getBurgerIndex());
-            brett.setBurgerIndex();
-            brett.getHamburgere().add(burger);
-
-            System.out.println(toString(burger));
-            brett.notifyAll();
-        }
+    private void lagBurger() throws InterruptedException {
+        skrivUt(brett.add());
     }
 
     public void run() {
         while (true) {
-            lagBurger();
-
             try {
+                lagBurger();
                 Thread.sleep(ThreadLocalRandom.current().nextLong(2, 6) * 1000);
             } catch (InterruptedException e) {
             }
         }
     }
 
-    public String toString(Hamburger hamburger) {
-        return String.format("%s (kokk) legger på hamburger %s. Brett: %s", navn, hamburger, brett.toString());
+    public void skrivUt(Hamburger hamburger) {
+        System.out.println(String.format("%s (kokk) legger på hamburger %s. Brett: %s", navn, hamburger, brett.toString()));
     }
 }
